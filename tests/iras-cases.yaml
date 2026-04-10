@@ -1,0 +1,92 @@
+# IRAS Tax FAQ - Evaluation Test Cases
+# Covers 10 key areas of Singapore taxation
+
+- description: Personal income tax e-filing deadline
+  vars:
+    prompt: What is the deadline for filing personal income tax in Singapore for e-filing?
+  assert:
+    - type: icontains
+      value: "april"
+    - type: icontains
+      value: "e-filing"
+
+- description: GST registration threshold
+  vars:
+    prompt: At what annual turnover threshold must a business register for GST in Singapore?
+  assert:
+    - type: icontains
+      value: "1 million"
+    - type: icontains
+      value: "turnover"
+
+- description: CPF relief eligibility
+  vars:
+    prompt: Who is eligible for CPF relief on their personal income tax return in Singapore?
+  assert:
+    - type: icontains
+      value: "employee"
+    - type: icontains
+      value: "cpf"
+
+- description: Corporate income tax rate
+  vars:
+    prompt: What is the corporate income tax rate in Singapore?
+  assert:
+    - type: icontains
+      value: "17%"
+    - type: icontains
+      value: "chargeable income"
+
+- description: Tax residency 183-day rule
+  vars:
+    prompt: How does Singapore determine whether a foreigner is a tax resident for income tax purposes?
+  assert:
+    - type: icontains
+      value: "183 days"
+    - type: icontains
+      value: "resident"
+
+- description: Auto-Inclusion Scheme (AIS)
+  vars:
+    prompt: What is the Auto-Inclusion Scheme (AIS) and how does it affect employees when filing taxes?
+  assert:
+    - type: icontains
+      value: "employer"
+    - type: icontains
+      value: "income"
+
+- description: Property tax rates
+  vars:
+    prompt: How is property tax calculated in Singapore, and are there different rates for owner-occupied versus non-owner-occupied residential properties?
+  assert:
+    - type: icontains
+      value: "annual value"
+    - type: icontains
+      value: "owner-occupied"
+
+- description: SRS contribution limits
+  vars:
+    prompt: What is the maximum annual SRS contribution limit for Singapore citizens and permanent residents?
+  assert:
+    - type: icontains
+      value: "15,300"
+    - type: icontains
+      value: "srs"
+
+- description: Foreign-sourced income exemption
+  vars:
+    prompt: Is foreign-sourced income taxable in Singapore for individuals and companies?
+  assert:
+    - type: icontains
+      value: "foreign-sourced"
+    - type: icontains
+      value: "foreign"
+
+- description: IRAS late filing penalties
+  vars:
+    prompt: What penalties does IRAS impose for late filing of personal income tax returns?
+  assert:
+    - type: icontains
+      value: "penalty"
+    - type: icontains
+      value: "late"

@@ -1,0 +1,17 @@
+{
+  "name": "llm-eval-iras",
+  "version": "1.0.0",
+  "description": "LLM evaluation harness for IRAS tax FAQ chatbot using promptfoo",
+  "main": "index.js",
+  "scripts": {
+    "eval": "promptfoo eval",
+    "eval:view": "promptfoo view",
+    "test": "promptfoo eval --ci"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "promptfoo": "^0.121.3"
+  }
+}

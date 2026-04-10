@@ -10,6 +10,7 @@ providers:
   - id: openai:gpt-4o-mini
     config:
       temperature: 0
+      retries: 3
 
 tests: file://tests/iras-cases.yaml
 

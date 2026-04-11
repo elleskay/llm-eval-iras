@@ -6,7 +6,7 @@
   "scripts": {
     "eval": "promptfoo eval",
     "eval:view": "promptfoo view",
-    "test": "promptfoo eval --ci"
+    "test": "promptfoo eval --no-cache"
   },
   "keywords": [],
   "author": "",

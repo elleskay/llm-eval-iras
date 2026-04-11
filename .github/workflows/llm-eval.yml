@@ -10,12 +10,14 @@ jobs:
   eval:
     name: Run promptfoo evaluation
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js 24
         uses: actions/setup-node@v4
         with:
           node-version: "24"
@@ -36,7 +38,7 @@ jobs:
       # run even when individual assertions fail (promptfoo --ci exits non-zero
       # on any assertion failure). The 85% gate below is the authoritative check.
       - name: Run LLM evaluation
-        run: npx promptfoo eval --ci --output output/results.json
+        run: npx promptfoo eval --output output/results.json --no-cache
         continue-on-error: true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}

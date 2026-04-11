@@ -1,6 +1,34 @@
 # LLM Eval — IRAS Tax FAQ Chatbot
 
-Evaluates LLM responses for a Singapore IRAS tax FAQ assistant using [promptfoo](https://promptfoo.dev). Tests two providers (Claude Haiku and GPT-4o mini) against 10 tax-domain test cases covering key IRAS topics.
+[![LLM Eval](https://github.com/elleskay/llm-eval-iras/actions/workflows/llm-eval.yml/badge.svg)](https://github.com/elleskay/llm-eval-iras/actions/workflows/llm-eval.yml)
+
+Evaluates LLM responses for a Singapore IRAS tax FAQ assistant using [promptfoo](https://promptfoo.dev). Tests two providers (Claude Haiku and GPT-4o mini) against 30 test cases across 5 behavioural categories, with a CI gate on every push to `main`.
+
+## How it works
+
+```
+User Tax Query
+      │
+      ▼
+System Prompt (IRAS context & guardrails)
+      │
+      ▼
+LLM Provider  ──────────────────────────────┐
+(Claude Haiku │ GPT-4o mini)                │
+      │                                     │
+      ▼                                     │
+promptfoo Assertions                        │
+  · contains / icontains / not-contains     │
+  · llm-rubric (LLM-as-Judge)  ◄────────────┘
+      │
+      ▼
+Pass / Fail Report  (output/results.json)
+      │
+      ▼
+CI Gate  (≥ 80% pass rate required)
+      │
+   PASS / FAIL
+```
 
 ## Project Structure
 
@@ -92,6 +120,24 @@ npx promptfoo eval --verbose
 | OpenAI | `gpt-4o-mini` |
 
 Both providers use `temperature: 0` for deterministic, reproducible results.
+
+## Results
+
+The suite runs **30 test cases** across two providers (Claude Haiku and GPT-4o mini) on every push to `main`.
+
+| Category | Cases | Assertion types |
+|---|---|---|
+| Core IRAS facts (deadlines, rates, thresholds) | 10 | `icontains`, `llm-rubric` |
+| Hallucination prevention | 5 | `not-contains`, `not-icontains`, `llm-rubric` |
+| PII handling (NRIC / UEN echo) | 5 | `not-contains`, `llm-rubric` |
+| Personalised advice refusal | 5 | `icontains`, `not-contains`, `llm-rubric` |
+| Edge cases & threshold ambiguity | 5 | `icontains`, `llm-rubric` |
+
+Ten of the thirty cases carry an **LLM-as-Judge** (`llm-rubric`) assertion evaluated by Claude Haiku, covering three behavioural axes: hallucination of tax thresholds or deadlines, inappropriate personalised advice, and exposure of sensitive taxpayer identifiers. The CI gate requires a pass rate of **≥ 80%** across all assertions and both providers.
+
+## Why this matters
+
+An LLM deployed as a government tax assistant can cause direct financial harm if it fabricates thresholds, misquotes deadlines, or gives confident but wrong advice — a user told the wrong GST registration turnover or an incorrect filing date may face penalties with no recourse against the model. Unlike general-purpose chatbots, high-stakes public-sector applications require behavioural guarantees that cannot be validated manually at scale once the system is live. Automated, CI-gated evaluations are therefore not a quality-of-life improvement but a prerequisite: they create a reproducible safety check that must pass before any prompt change, model upgrade, or system update reaches users.
 
 ## Notes
 

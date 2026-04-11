@@ -35,8 +35,8 @@ jobs:
       #   - OPENAI_API_KEY     →  used by the gpt-4o-mini provider
       #
       # continue-on-error: true so that the upload and pass-rate steps always
-      # run even when individual assertions fail (promptfoo --ci exits non-zero
-      # on any assertion failure). The 85% gate below is the authoritative check.
+      # run even when individual assertions fail (promptfoo exits non-zero
+      # on any assertion failure). The 80% gate below is the authoritative check.
       - name: Run LLM evaluation
         run: npx promptfoo eval --output output/results.json --no-cache
         continue-on-error: true
@@ -54,8 +54,8 @@ jobs:
           retention-days: 30
 
       # Reads output/results.json, computes (passed / total) * 100,
-      # and exits 1 if the pass rate is below 85%.
-      - name: Check pass rate (threshold 85%)
+      # and exits 1 if the pass rate is below 80%.
+      - name: Check pass rate (threshold 80%)
         if: always()
         run: |
           node - << 'EOF'

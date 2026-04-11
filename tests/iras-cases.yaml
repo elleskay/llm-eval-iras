@@ -1,5 +1,5 @@
 # IRAS Tax FAQ - Evaluation Test Cases
-# Covers 10 key areas of Singapore taxation
+# 30 cases across 5 categories: core facts, hallucination prevention, PII handling, advice refusal, edge cases
 
 - description: Personal income tax e-filing deadline
   vars:

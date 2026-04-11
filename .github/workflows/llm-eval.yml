@@ -1,0 +1,102 @@
+name: LLM Eval
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  eval:
+    name: Run promptfoo evaluation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create output directory
+        run: mkdir -p output
+
+      # API keys are read from GitHub repository secrets.
+      # Add them at: Settings → Secrets and variables → Actions → New repository secret
+      #   - ANTHROPIC_API_KEY  →  used by the claude-haiku-4-5-20251001 provider (evals + llm-rubric judge)
+      #   - OPENAI_API_KEY     →  used by the gpt-4o-mini provider
+      #
+      # continue-on-error: true so that the upload and pass-rate steps always
+      # run even when individual assertions fail (promptfoo --ci exits non-zero
+      # on any assertion failure). The 85% gate below is the authoritative check.
+      - name: Run LLM evaluation
+        run: npx promptfoo eval --ci --output output/results.json
+        continue-on-error: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      # Upload results regardless of eval outcome so failures are inspectable.
+      - name: Upload eval report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: output/results.json
+          retention-days: 30
+
+      # Reads output/results.json, computes (passed / total) * 100,
+      # and exits 1 if the pass rate is below 85%.
+      - name: Check pass rate (threshold 85%)
+        if: always()
+        run: |
+          node - << 'EOF'
+          const fs = require('fs');
+
+          let raw;
+          try {
+            raw = fs.readFileSync('output/results.json', 'utf8');
+          } catch (err) {
+            console.error('ERROR: could not read output/results.json —', err.message);
+            process.exit(1);
+          }
+
+          const data = JSON.parse(raw);
+
+          // Primary: use the pre-computed stats block that promptfoo writes.
+          // Fallback: count success flags across the results array.
+          const stats = data.results?.stats;
+          const resultsList = data.results?.results ?? [];
+
+          let passed, total;
+          if (stats && (stats.successes !== undefined || stats.failures !== undefined)) {
+            passed = stats.successes ?? 0;
+            total  = (stats.successes ?? 0) + (stats.failures ?? 0);
+          } else {
+            total  = resultsList.length;
+            passed = resultsList.filter(r => r.success).length;
+          }
+
+          if (total === 0) {
+            console.error('ERROR: no test results found in output/results.json');
+            process.exit(1);
+          }
+
+          const passRate = (passed / total) * 100;
+
+          console.log(`Results : ${passed} passed, ${total - passed} failed of ${total} total`);
+          console.log(`Pass rate: ${passRate.toFixed(1)}%`);
+
+          if (passRate < 85) {
+            console.error(`FAIL: ${passRate.toFixed(1)}% is below the required 85% threshold`);
+            process.exit(1);
+          }
+
+          console.log(`PASS: ${passRate.toFixed(1)}% meets the 85% threshold`);
+          EOF

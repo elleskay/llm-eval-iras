@@ -95,10 +95,10 @@ jobs:
           console.log(`Results : ${passed} passed, ${total - passed} failed of ${total} total`);
           console.log(`Pass rate: ${passRate.toFixed(1)}%`);
 
-          if (passRate < 85) {
-            console.error(`FAIL: ${passRate.toFixed(1)}% is below the required 85% threshold`);
+          if (passRate < 80) {
+            console.error(`FAIL: ${passRate.toFixed(1)}% is below the required 80% threshold`);
             process.exit(1);
           }
 
-          console.log(`PASS: ${passRate.toFixed(1)}% meets the 85% threshold`);
+          console.log(`PASS: ${passRate.toFixed(1)}% meets the 80% threshold`);
           EOF

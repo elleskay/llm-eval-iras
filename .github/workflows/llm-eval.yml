@@ -55,6 +55,9 @@ jobs:
 
       # Reads output/results.json, computes (passed / total) * 100,
       # and exits 1 if the pass rate is below 80%.
+      - name: Run router tests
+        run: npm run test:router
+
       - name: Check pass rate (threshold 80%)
         if: always()
         run: |

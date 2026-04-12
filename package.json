@@ -6,7 +6,9 @@
   "scripts": {
     "eval": "promptfoo eval",
     "eval:view": "promptfoo view",
-    "test": "promptfoo eval --no-cache"
+    "test": "promptfoo eval --no-cache",
+    "route": "node router-demo.mjs",
+    "test:router": "node --test tests/router.test.mjs"
   },
   "keywords": [],
   "author": "",

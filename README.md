@@ -13,6 +13,9 @@ User Tax Query
 System Prompt (IRAS context & guardrails)
       │
       ▼
+Model Router (optional)                     ← routes by PII / intent / default
+      │
+      ▼
 LLM Provider  ──────────────────────────────┐
 (Claude Haiku │ GPT-4o mini)                │
       │                                     │
@@ -46,6 +49,37 @@ llm-eval-iras/
 ├── .gitignore
 └── README.md
 ```
+
+## Model Router
+
+`router.mjs` is a lightweight model gateway prototype that selects a provider and model before a query reaches the LLM. Rather than sending every request to a single fixed model, the router inspects each query for PII markers, intent signals, and content patterns, then dispatches to whichever model is most appropriate for that query type — keeping sensitive data within a compliant provider and reserving cheaper factual lookups for a cost-optimised model.
+
+```
+             ┌─────────────────────────────────────┐
+             │             Model Router             │
+Query ──────►│  PII?  → Claude Haiku (Anthropic)   ├──► Response
+             │  Advice? → Claude Haiku (Anthropic) │
+             │  Factual? → GPT-4o mini (OpenAI)    │
+             │  Default → Claude Haiku (Anthropic) │
+             └─────────────────────────────────────┘
+```
+
+**Routing rules**
+
+| Rule | Trigger | Model |
+|------|---------|-------|
+| `pii-sensitive` | NRIC (`S/T` + 7 digits + letter) or UEN detected in query | `claude-haiku-4-5-20251001` |
+| `personalised-advice` | Query contains "should I", "will I", "how much will I pay", or "my income" | `claude-haiku-4-5-20251001` |
+| `factual-lookup` | Query contains "what is", "what are", "deadline", "rate", or "threshold" | `gpt-4o-mini` |
+| `default` | No rule matched | `claude-haiku-4-5-20251001` |
+
+**Run the demo**
+
+```bash
+npm run route
+```
+
+Prints a routing table for 5 example queries and saves decisions to `output/routing-log.json`.
 
 ## Setup
 
